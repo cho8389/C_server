@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+<!-- 인증처리 -->
+<authentication-manager alias="mobile">
+	<authentication-provider>
+		<jdbc-user-service data-source-ref="dataSource"
+			users-by-username-query="select emp_id as username, emp_pw as password,enabled
+									 from employee
+									 where emp_id = ?"
+			authorities-by-username-query="select emp_id as username, role
+			                               from role
+			                               where emp_id = ?"
+		/>
+	</authentication-provider>
+</authentication-manager>
+<!-- 인증처리 -->
+<authentication-manager alias="client">
+	<authentication-provider>
+		<jdbc-user-service data-source-ref="dataSource"
+			users-by-username-query="select emp_id as username, emp_pw as password,enabled
+									 from employee
+									 where emp_id = ?"
+			authorities-by-username-query="select emp_id as username, role
+			                               from role
+			                               where emp_id = ?"
+		/>
+	</authentication-provider>
+</authentication-manager>
+<!-- 인허가 처리 -->
+<http use-expressions="true" auto-config="true" authentication-manager-ref="mobile" pattern="/m/**">
+	<access-denied-handler error-page="/loginmain"/>
+	<intercept-url pattern="/resources/**" access="permitAll"/>
+	<intercept-url pattern="/login" access="isAnonymous()"/>
+	<intercept-url pattern="/m/login" access="isAnonymous()"/>
+	<intercept-url pattern="/loginRequest" access="permitAll"/>
+	<intercept-url pattern="/logincheck" access="permitAll"/>
+	<intercept-url pattern="/loginmain" access="permitAll"/>
+	<intercept-url pattern="/test" access="permitAll"/>
+	<intercept-url pattern="/**" access="isAuthenticated()"/>
+	
+	<form-login login-page="/loginmain"
+				login-processing-url="/loginRequest"
+				username-parameter="uid"
+				password-parameter="upwd"
+				authentication-success-handler-ref="loginSuccessHandler"
+				authentication-failure-handler-ref="loginFailureHandler"
+	/>			
+				
+	
+	<logout logout-url="/logout"
+			invalidate-session="true"
+			logout-success-url="/m/login"
+	/>
+</http>
+<!-- 인허가 처리 -->
+<http use-expressions="true" create-session="stateless" authentication-manager-ref="client" pattern="/clogin/**">
+	<access-denied-handler error-page="/loginmain"/>
+	<intercept-url pattern="/resources/**" access="permitAll"/>
+	<intercept-url pattern="/getmem" access="permitAll"/>
+	<intercept-url pattern="/**" access="isAuthenticated()"/>
+	<http-basic/>
+	
+	<form-login login-processing-url="/loginRequest"
+				username-parameter="uid"
+				password-parameter="upwd"
+				authentication-success-handler-ref="CloginSuccessHandler"
+				authentication-failure-handler-ref="loginFailureHandler"
+	/>			
+				
+	
+	<logout logout-url="/logout"
+			invalidate-session="true"
+			logout-success-url="/m/login"
+	/>
+</http>
+
+<beans:bean id="loginSuccessHandler"
+            class="com.carmen.security.LoginSuccessHandler"
+            p:defaultTargetUrl="/logincheck"/>
+<beans:bean id="loginFailureHandler"
+	 class="com.carmen.security.LoginFailureHandler"
+	 p:loginFormPath="/login?error=true" />
+<beans:bean id="CloginSuccessHandler"
+            class="com.carmen.security.CLoginSuccessHandler"
+            p:defaultTargetUrl="/logincheck"/>
+</beans:beans>

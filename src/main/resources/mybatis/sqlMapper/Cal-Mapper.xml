@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="CalMapper">
+
+	<select id="selectcalall" resultType="cal">
+		select * from calculate
+	</select>
+	
+	<select id="selectcalone" resultType="cal">
+		select * from calculate where cal_id=#{cal_id}
+	</select>
+
+	<select id="selectcalbyid" resultType="cal">
+		select * from calculate where emp_id=#{emp_id} order by ordreq_id desc
+	</select>
+	
+	<select id="selectcalbyreqid" resultType="cal">
+		select * from calculate where ordreq_id=#{ordreq_id}
+	</select>
+	
+	<update id="insertcal">
+		insert into calculate(ordreq_id,emp_id,cal_date,cal_price,cal_bank,cal_name,cal_state,cal_bill,cal_check,cal_note)
+		values(#{ordreq_id},#{emp_id},#{cal_date},#{cal_price},#{cal_bank},#{cal_name},#{cal_state},#{cal_bill},#{cal_check},#{cal_note})
+	</update>
+	
+	<update id="updatecal">
+		update calculate set cal_date=#{cal_date},cal_price=#{cal_price},cal_bank=#{cal_bank},cal_name=#{cal_name},cal_state=#{cal_state},cal_bill=#{cal_bill},cal_check=#{cal_check},cal_chkdate=#{cal_chkdate},cal_note=#{cal_note}
+		where cal_id=#{cal_id}
+	</update>
+	
+	<update id="deletecal">
+		delete from calculate where cal_id=#{cal_id}
+	</update>
+	
+	<update id="deletebyreqid">
+		delete from calculate where ordreq_id=#{ordreq_id}
+	</update>
+	
+	<select id="countsearchcal" resultType="int">
+		select count(cal_id) from calculate
+		where ordreq_id is not null
+		<include refid="calsearch"></include>
+	</select>
+	
+	<sql id="calsearch">
+			<if test='emp_id != null and emp_id !=""'>
+				and emp_id like CONCAT('%',#{emp_id},'%')
+			</if>
+			<if test="cal_date != null and cal_date_e == null">
+				and cal_date >= #{cal_date}
+			</if>
+			<if test="cal_date != null and cal_date_e != null">
+				and cal_date >= #{cal_date} and #{cal_date_e} >= cal_date
+			</if>
+			<if test="cal_price != null and cal_price !=0">
+				and cal_price like CONCAT('%',#{cal_price},'%')
+			</if>
+			<if test='cal_bank != null and cal_bank !=""'>
+				and cal_bank like CONCAT('%',#{cal_bank},'%')
+			</if>
+			<if test='cal_name != null and cal_name !=""'>
+				and cal_name like CONCAT('%',#{cal_name},'%')
+			</if>
+			<if test='cal_state != null and cal_state !="" and cal_state !=0'>
+				and cal_state like CONCAT('%',#{cal_state},'%')
+			</if>
+			<if test='cal_bill != null and cal_bill !=""'>
+				and cal_bill like CONCAT('%',#{cal_bill},'%')
+			</if>
+			<if test='cal_check != null and cal_check !=""'>
+				and cal_check like CONCAT('%',#{cal_check},'%')
+			</if>
+			<if test="cal_chkdate != null">
+				and cal_chkdate like CONCAT('%',#{cal_chkdate},'%')
+			</if>
+			<if test='cal_note != null and cal_note !=""'>
+				and cal_note like CONCAT('%',#{cal_note},'%')
+			</if>
+	</sql>
+	
+	<select id="searchsortcal" resultType="cal">
+		select *
+		from calculate
+		where ordreq_id is not null
+		<include refid="calsearch"></include>
+		order by ordreq_id desc
+	</select>
+</mapper>

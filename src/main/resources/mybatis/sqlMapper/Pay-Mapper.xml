@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="PayMapper">
+
+	<select id="selectpayall" resultType="pay">
+		select * from payment
+	</select>
+	
+	<select id="selectpayone" resultType="pay">
+		select * from payment where pay_id=#{pay_id}
+	</select>
+
+	<select id="selectpaybyid" resultType="pay">
+		select * from payment where emp_id=#{emp_id} order by ordreq_id desc
+	</select>
+	
+	<select id="selectpaybyreqid" resultType="pay">
+		select * from payment where ordreq_id=#{ordreq_id}
+	</select>
+	
+	<update id="insertpay">
+		insert into payment(ordreq_id,emp_id,pay_date,pay_price)
+		values(#{ordreq_id},#{emp_id},#{pay_date},#{pay_price})
+	</update>
+	
+	<update id="updatepay">
+		update payment set pay_state=#{pay_state},pay_price=#{pay_price}
+		where pay_id=#{pay_id}
+	</update>
+	
+	<update id="updatepaystate">
+		update payment set pay_state=#{pay_state}
+		where pay_id=#{pay_id}
+	</update>
+	
+	<update id="deletepay">
+		delete from payment where pay_id=#{pay_id}
+	</update>
+	
+	<update id="deletebyreqid">
+		delete from payment where ordreq_id=#{ordreq_id}
+	</update>
+	
+	<select id="countsearchpay" resultType="int">
+		select count(pay_id) from payment
+		where ordreq_id is not null
+		<include refid="paysearch"></include>
+	</select>
+	
+	<sql id="paysearch">
+			<if test='emp_id != null and emp_id !=""'>
+				and emp_id like CONCAT('%',#{emp_id},'%')
+			</if>
+			<if test='pay_state != null and pay_state !="" and pay_state !=0'>
+				and pay_date like CONCAT('%',#{pay_state},'%')
+			</if>
+			<if test="pay_price != null and pay_price!=0">
+				and pay_price like CONCAT('%',#{pay_price},'%')
+			</if>
+			<if test="pay_date != null and pay_date_e == null">
+				and pay_date >= #{pay_date}
+			</if>
+			<if test="pay_date != null and pay_date_e != null">
+				and pay_date >= #{pay_date} and #{pay_date_e} >= pay_date
+			</if>
+	</sql>
+	
+	<select id="searchsortpay" resultType="pay">
+		select *
+		from payment
+		where ordreq_id is not null
+		<include refid="paysearch"></include>
+		order by ordreq_id desc
+	</select>
+</mapper>

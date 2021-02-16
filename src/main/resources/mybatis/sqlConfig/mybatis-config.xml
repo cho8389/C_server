@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias alias="str" type="java.lang.String" />
+		<typeAlias alias="int" type="java.lang.Integer" />
+		<typeAlias alias="mem" type="com.carmen.domain.MemberVO"/>
+		<typeAlias alias="role" type="com.carmen.domain.RoleVO"/>
+		<typeAlias alias="req" type="com.carmen.domain.ReqVO"/>
+		<typeAlias alias="ord" type="com.carmen.domain.OrdVO"/>
+		<typeAlias alias="del" type="com.carmen.domain.DelVO"/>
+		<typeAlias alias="pay" type="com.carmen.domain.PayVO"/>
+		<typeAlias alias="cal" type="com.carmen.domain.CalVO"/>
+	</typeAliases>
+</configuration>

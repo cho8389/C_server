@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd">
+
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<mvc:interceptors>
+		<!-- SitePreferenceHandlerInterceptor 는 DeviceResolverHandlerInterceptor 
+			뒤에 위치해야 합니다. -->
+		<bean class="org.springframework.mobile.device.DeviceResolverHandlerInterceptor" />
+		<bean class="org.springframework.mobile.device.site.SitePreferenceHandlerInterceptor" />
+	</mvc:interceptors>
+	<mvc:annotation-driven />
+	<bean id="dataSource"
+		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql://localhost:3306/test?autoReconnect=true&amp;useSSL=false&amp;serverTimezone=Asia/Seoul"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="1234"></property>
+	</bean>
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean"
+		p:dataSource-ref="dataSource" p:configLocation="classpath:/mybatis/sqlConfig/mybatis-config.xml"
+		p:mapperLocations="classpath:/mybatis/sqlMapper/**/*-Mapper.xml" />
+
+	<bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate"
+		destroy-method="clearCache" c:sqlSessionFactory-ref="sqlSessionFactory" />
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
+		p:dataSource-ref="dataSource" />
+
+	<bean id="transactionTemplate"
+		class="org.springframework.transaction.support.TransactionTemplate"
+		p:transactionManager-ref="transactionManager" />
+	<bean id="memberDAO" class="com.carmen.dao.impl.MemberDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="memberService" class="com.carmen.service.impl.MemberServiceImpl"
+		p:memberDAO-ref="memberDAO" />
+		
+	<bean id="reqDAO" class="com.carmen.dao.impl.ReqDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="reqService" class="com.carmen.service.impl.ReqServiceImpl"
+		p:reqDAO-ref="reqDAO" />
+	
+	<bean id="calDAO" class="com.carmen.dao.impl.CalDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="calService" class="com.carmen.service.impl.CalServiceImpl"
+		p:calDAO-ref="calDAO" />
+	
+	<bean id="delDAO" class="com.carmen.dao.impl.DelDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="delService" class="com.carmen.service.impl.DelServiceImpl"
+		p:delDAO-ref="delDAO" />
+	
+	<bean id="ordDAO" class="com.carmen.dao.impl.OrdDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="ordService" class="com.carmen.service.impl.OrdServiceImpl"
+		p:ordDAO-ref="ordDAO" />
+	
+	<bean id="payDAO" class="com.carmen.dao.impl.PayDAOImpl"
+		p:sqlSession-ref="sqlSession" />
+	<bean id="payService" class="com.carmen.service.impl.PayServiceImpl"
+		p:payDAO-ref="payDAO" />
+	
+	<bean id="webService" class="com.carmen.service.impl.WebServiceImpl"
+		p:reqDAO-ref="reqDAO"
+		p:calDAO-ref="calDAO"
+		p:delDAO-ref="delDAO"
+		p:ordDAO-ref="ordDAO"
+		p:payDAO-ref="payDAO" 
+		p:memberDAO-ref="memberDAO"/>
+	<bean id="wsconfig" class="com.carmen.utils.WebSocketConfigurer"/>
+	<bean id="socCon" class="com.carmen.controller.WebSocketController"/>
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+</beans>

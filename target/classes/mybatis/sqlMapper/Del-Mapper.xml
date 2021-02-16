@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="DelMapper">
+
+	<select id="selectdelall" resultType="del">
+		select * from delivery
+	</select>
+	
+	<select id="selectdelone" resultType="del">
+		select * from delivery where del_id=#{del_id}
+	</select>
+	
+	<select id="selectdelbyid" resultType="del">
+		select * from delivery where emp_id=#{emp_id} order by ordreq_id desc
+	</select>
+	
+	<select id="selectdelbyreqid" resultType="del">
+		select * from delivery where ordreq_id=#{ordreq_id}
+	</select>
+	
+	<update id="insertdel">
+		insert into delivery(ordreq_id,emp_id,,del_name,del_customer,del_amount,del_cost,del_price,del_type)
+		values(#{ordreq_id},#{emp_id},#{del_name},#{del_customer},#{del_amount},#{del_cost},#{del_price},#{del_type})
+	</update>
+	
+	<update id="updatedel">
+		update delivery set emp_id=#{emp_id},del_state=#{del_state},del_name=#{del_name},del_customer=#{customer},del_amount=#{del_amount},del_cost=#{del_cost},del_price=#{del_price},del_type=#{del_type}
+		where del_id=#{del_id}
+	</update>
+	
+	<update id="updatedelstate">
+		update delivery set del_state=#{del_state}
+		where del_id=#{del_id}
+	</update>
+	
+	<update id="deletedel">
+		delete from delivery where del_id=#{del_id}
+	</update>
+	
+	<update id="deletebyreqid">
+		delete from delivery where ordreq_id=#{ordreq_id}
+	</update>
+	
+	<select id="countsearchdel" resultType="int">
+		select count(del_id) from delivery
+		where ordreq_id is not null
+		<include refid="delsearch"></include>
+	</select>
+	
+	<sql id="delsearch">
+			<if test='emp_id != null and emp_id !=""'>
+				and emp_id like CONCAT('%',#{emp_id},'%')
+			</if>
+			<if test='del_state != null and del_state !="" and del_state !=0'>
+				and del_state like CONCAT('%',#{del_state},'%')
+			</if>
+			<if test="del_date != null and del_date_e == null">
+				and del_date >= #{del_date}
+			</if>
+			<if test="del_date != null and del_date_e != null">
+				and del_date >= #{del_date} and #{del_date_e} >= del_date
+			</if>
+			<if test='del_name != null and del_name !=""'>
+				and del_name like CONCAT('%',#{del_name},'%')
+			</if>
+			<if test='del_customer != null and del_customer !=""'>
+				and del_customer like CONCAT('%',#{del_customer},'%')
+			</if>
+			<if test="del_amount != null and del_amount!=0">
+				and del_amount like CONCAT('%',#{del_amount},'%')
+			</if>
+			<if test="del_cost != null and del_cost!=0">
+				and del_cost like CONCAT('%',#{del_cost},'%')
+			</if>
+			<if test="del_price != null and del_price!=0">
+				and del_price like CONCAT('%',#{del_price},'%')
+			</if>
+			<if test='del_type != null and del_type !="" and del_type!=0'>
+				and del_type like CONCAT('%',#{del_type},'%')
+			</if>
+	</sql>
+	
+	<select id="searchsortdel" resultType="del">
+		select *
+		from delivery
+		where ordreq_id is not null
+		<include refid="delsearch"></include>
+		order by ordreq_id desc
+	</select>
+</mapper>

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="MemberMapper">
+
+	<select id="selectmem" resultType="mem">
+		select * from employee
+	</select>
+
+	<select id="selectmembyid" resultType="mem">
+		select * from employee where emp_id=#{emp_id}
+	</select>
+	
+	<update id="insertmem">
+		insert into employee(emp_id,emp_pw,emp_name,emp_title,enabled)
+		values(#{emp_id},#{emp_pw},#{emp_name},#{emp_title},"1")
+	</update>
+	
+	<update id="updatemem">
+		update employee set emp_pw=#{emp_pw},emp_name=#{emp_name},emp_title=#{emp_title},enabled=#{enabled}
+		where emp_id=#{emp_id}
+	</update>
+	
+	<update id="deletemem">
+		delete from employee where emp_id=#{emp_id} 
+	</update>
+	
+	<sql id="mem_search">
+		<if test="search != null">
+			<if test="search == 'id'.toString()">
+				and emp_id like '%'||#{keyword}||'%'
+			</if>
+			<if test="search == 'name'.toString()">
+				and emp_name like '%'||#{keyword}||'%'
+			</if>
+			<if test="search == 'title'.toString()">
+				and emp_title like '%'||#{keyword}||'%'
+			</if>
+			<if test="search == 'enabled'.toString()">
+				and enabled like '%'||#{keyword}||'%'
+			</if>
+		</if>
+	</sql>
+	
+	<sql id="mem_ord">
+		<if test="ord != null">
+			<if test="ord == 'id_asc'.toString()">
+				order by emp_id
+			</if>
+			<if test="ord == 'id_desc'.toString()">
+				order by emp_id desc
+			</if>
+			<if test="ord == 'name_asc'.toString()">
+				order by emp_name
+			</if>
+			<if test="ord == 'name_desc'.toString()">
+				order by emp_name desc
+			</if>
+			<if test="ord == 'title_asc'.toString()">
+				order by emp_title
+			</if>
+			<if test="ord == 'title_desc'.toString()">
+				order by emp_title desc
+			</if>
+			<if test="ord == 'enabled_asc'.toString()">
+				order by enabled
+			</if>
+			<if test="ord == 'enabled_desc'.toString()">
+				order by enabled desc
+			</if>
+		</if>
+	</sql>
+	
+	<select id="searchsortmem" resultType="mem">
+		select *
+		from employee
+		where emp_id is not null
+		<include refid="mem_search"></include>
+		<include refid="mem_ord"></include>
+	</select>
+	
+	<select id="selectrole" resultType="role">
+		select * from role where emp_id=#{emp_id}
+	</select>
+	
+	<update id="insertrole">
+		insert into role(emp_id,role)
+		values(#{emp_id},#{role})
+	</update>
+	<update id="deleterole">
+		delete from role where emp_id=#{emp_id}
+	</update>
+	
+	<sql id="memsearch">
+			<if test='emp_id != null and emp_id !=""'>
+				and emp_id like CONCAT('%',#{emp_id},'%')
+			</if>
+			<if test='emp_name != null and emp_name !=""'>
+				and emp_name like CONCAT('%',#{emp_name},'%')
+			</if>
+			<if test='emp_pw != null and emp_pw !=""'>
+				and emp_pw like CONCAT('%',#{emp_pw},'%')
+			</if>
+			<if test='emp_title != null and emp_title !=""'>
+				and emp_title like CONCAT('%',#{emp_title},'%')
+			</if>
+			<if test='enabled != null and enabled !=""'>
+				and enabled like CONCAT('%',#{enabled},'%')
+			</if>
+	</sql>
+	
+	<select id="searchmem" resultType="mem">
+		select *
+		from employee
+		where emp_id is not null
+		<include refid="memsearch"></include>
+	</select>
+	
+</mapper>
